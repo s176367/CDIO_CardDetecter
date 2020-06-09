@@ -29,6 +29,7 @@ cv2.createTrackbar("area", "parameters", 10000, 20000, empty)
 threshold1 = cv2.getTrackbarPos("Threshold1", "Parameters")
 threshold2 = cv2.getTrackbarPos("Threshold2", "Parameters")
 
+counter = 0
 
 def stackImages(scale, imgArray):  # metode herfra https://www.murtazahassan.com/real-time-contours-shape-detection/
     rows = len(imgArray)
@@ -64,7 +65,10 @@ def stackImages(scale, imgArray):  # metode herfra https://www.murtazahassan.com
 
 
 def getContours(img, imgContour):
+    global counter
     contours, hierachy = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+
+
 
     for contour in contours:
         area = cv2.contourArea(contour)
@@ -85,13 +89,15 @@ def getContours(img, imgContour):
                         (0, 255, 0), 2)
 
             if cv2.waitKey(1) & 0xFF == ord('c'):
-                cv2.imwrite('warpedPicture.jpg', imgContour)
-                imgstatic = cv2.imread('warpedPicture.jpg')
+                counter = counter + 1
+                cv2.imwrite('warpedPicture' + str(counter) + '.jpg', imgContour)
+                imgstatic = cv2.imread('warpedPicture' + str(counter) + '.jpg')
                 coordinates.insert(0, x)
                 coordinates.insert(1, y)
                 coordinates.insert(2, h)
                 coordinates.insert(3, w)
                 warpPicture(coordinates[0], coordinates[1], coordinates[2], coordinates[3], imgstatic)
+
 
 
 def warpPicture(x, y, w, h, img):
@@ -100,7 +106,7 @@ def warpPicture(x, y, w, h, img):
     pts2 = np.float32([[0,0], [width,0], [0, height ], [width, height]])
     matrix = cv2.getPerspectiveTransform(pts1, pts2)
     output = cv2.warpPerspective(img, matrix, (width, height))
-    cv2.imshow('warpedPicture', output)
+    cv2.imshow('warpedPicture' + str(counter), output)
 
 
 while True:
