@@ -1,5 +1,6 @@
 import argparse
 import cv2
+import imutils as imutils
 import numpy as np
 
 # Dette project er udarbejdet fra denne vejledning: https://www.youtube.com/watch?v=Fchzk1lDt7Q
@@ -74,27 +75,24 @@ def getContours(img, imgContour, standardimg):
     global counter, string
     contours, hierachy = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
+
     for contour in contours:
         area = cv2.contourArea(contour)
         areaMin = cv2.getTrackbarPos("area", "parameters")
         if area > areaMin:
             peri = cv2.arcLength(contour, True)
-            approx = cv2.approxPolyDP(contour, 0.04 * peri, True)
-            cv2.drawContours(imgContour, [approx], -1, (255, 0, 255), 5)
-            approx.ravel()
-            print(approx)
+            approx = cv2.approxPolyDP(contour, 0.02 * peri, True)
+            box = np.int0(approx)
 
+            cv2.drawContours(imgContour, approx, -1, (255, 0, 255), 5)
 
             if len(approx) == 4:
                 x, y, w, h = cv2.boundingRect(approx)
 
-
-                cv2.rectangle(imgContour, (x, y), (x + w, y + h), (255, 255, 0), 3)
-
                 # cv2.putText(imgContour, "Points: " + str(len(approx)), (x + w + 20, y + 20), cv2.FONT_HERSHEY_COMPLEX,
                 # 0.7, (0, 255, 0), 2)
-                #cv2.putText(imgContour, "Area: " + str(int(area)), (x + w + 20, y + 45), cv2.FONT_HERSHEY_COMPLEX, 0.7,
-                    #        (0, 255, 0), 2)
+                # cv2.putText(imgContour, "Area: " + str(int(area)), (x + w + 20, y + 45), cv2.FONT_HERSHEY_COMPLEX, 0.7,
+                #        (0, 255, 0), 2)
 
                 if cv2.waitKey(1) & 0xFF == ord('c'):
                     counter = counter + 1
@@ -105,35 +103,35 @@ def getContours(img, imgContour, standardimg):
                     coordinates.insert(2, h)
                     coordinates.insert(3, w)
                     warpPic = standardimg.copy()
-                    warpPicture(coordinates[0], coordinates[1], coordinates[2], coordinates[3], warpPic)
+                    warpPicture(box[0], box[1], box[2], box[3], warpPic)
 
             else:
                 x, y, w, h = cv2.boundingRect(approx)
                 cv2.putText(imgContour,
-                             "Ret kort indtil",
-                             (x + w + 20, y + 20),
-                             cv2.FONT_HERSHEY_COMPLEX, 0.7,
-                             (0, 255, 0), 2)
+                            "Ret kort indtil",
+                            (x + w + 20, y + 20),
+                            cv2.FONT_HERSHEY_COMPLEX, 0.7,
+                            (0, 255, 0), 2)
                 cv2.putText(imgContour,
                             "green firkant vises ",
-                             (x + w + 20, y + 45),
-                             cv2.FONT_HERSHEY_COMPLEX, 0.7,
-                             (0, 255, 0), 2)
+                            (x + w + 20, y + 45),
+                            cv2.FONT_HERSHEY_COMPLEX, 0.7,
+                            (0, 255, 0), 2)
                 cv2.putText(imgContour,
-                             "MAKS 4 Corners ",
-                             (x + w + 20, y + 65),
-                             cv2.FONT_HERSHEY_COMPLEX, 0.7,
-                             (0, 255, 0), 2)
+                            "MAKS 4 Corners ",
+                            (x + w + 20, y + 65),
+                            cv2.FONT_HERSHEY_COMPLEX, 0.7,
+                            (0, 255, 0), 2)
                 cv2.putText(imgContour,
-                             "Antal Corners " + str(len(approx)),
-                             (x + w + 20, y + 85),
-                             cv2.FONT_HERSHEY_COMPLEX, 0.7,
-                             (0, 255, 0), 2)
+                            "Antal Corners " + str(len(approx)),
+                            (x + w + 20, y + 85),
+                            cv2.FONT_HERSHEY_COMPLEX, 0.7,
+                            (0, 255, 0), 2)
 
 
-def warpPicture(x, y, w, h, img):
+def warpPicture(y, x , w, h, img):
     width, height, = 500, 500
-    pts1 = np.float32([[x, y], [x + h, y], [x, y + w], [x + h, y + w]])
+    pts1 = np.float32([x, y, w, h])
     pts2 = np.float32([[0, 0], [width, 0], [0, height], [width, height]])
     matrix = cv2.getPerspectiveTransform(pts1, pts2)
     output = cv2.warpPerspective(img, matrix, (width, height))
