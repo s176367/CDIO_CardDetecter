@@ -83,8 +83,9 @@ def getContours(img, imgContour, standardimg):
             peri = cv2.arcLength(contour, True)
             approx = cv2.approxPolyDP(contour, 0.02 * peri, True)
             box = np.int0(approx)
+            print(box)
 
-            cv2.drawContours(imgContour, approx, -1, (255, 0, 255), 5)
+            cv2.drawContours(imgContour, box, -1, (255, 0, 255), 5)
 
             if len(approx) == 4:
                 x, y, w, h = cv2.boundingRect(approx)
@@ -130,7 +131,7 @@ def getContours(img, imgContour, standardimg):
 
 
 def warpPicture(y, x , w, h, img):
-    width, height, = 500, 500
+    width, height, = 400, 400
     pts1 = np.float32([x, y, w, h])
     pts2 = np.float32([[0, 0], [width, 0], [0, height], [width, height]])
     matrix = cv2.getPerspectiveTransform(pts1, pts2)
