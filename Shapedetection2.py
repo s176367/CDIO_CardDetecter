@@ -1,5 +1,6 @@
 import argparse
 import cv2
+import os
 import imutils as imutils
 import numpy as np
 
@@ -83,7 +84,7 @@ def getContours(img, imgContour, standardimg):
             peri = cv2.arcLength(contour, True)
             approx = cv2.approxPolyDP(contour, 0.02 * peri, True)
             box = np.int0(approx)
-            print(box)
+
 
             cv2.drawContours(imgContour, box, -1, (255, 0, 255), 5)
 
@@ -136,8 +137,45 @@ def warpPicture(y, x , w, h, img):
     pts2 = np.float32([[0, 0], [width, 0], [0, height], [width, height]])
     matrix = cv2.getPerspectiveTransform(pts1, pts2)
     output = cv2.warpPerspective(img, matrix, (width, height))
-    cv2.imwrite('warpedPicture' + str(counter) + '.jpg', output)
+    checkAfAlle(output)
+    #cv2.imwrite('warpedPicture' + str(counter) + '.jpg', output)
     cv2.imshow('warpedPicture' + str(counter), output)
+
+
+def checkAfSpecifiktKort(img, template):
+    gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    w, h = template.shape[::-1]
+    result = cv2.matchTemplate(gray_img, template, cv2.TM_CCOEFF_NORMED)
+    loc = np.where(result >= 0.97)
+
+    for pt in zip(*loc[::-1]):
+        cv2.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0, 255, 0), 3)
+        return True
+    else:
+        print("No simmilarity found")
+        return False
+
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+
+
+def checkAfAlle(img):
+    path = "templateCards/"
+
+    # Iterer igennem alle templates
+    for image_path in os.listdir(path):
+
+        #Finder kortet
+        input_path = os.path.join(path, image_path)
+        template = cv2.imread(input_path, cv2.IMREAD_GRAYSCALE)
+
+        # Køre checkAfSpecifiktKort
+        if checkAfSpecifiktKort(img, template) == True:
+            path = input_path.replace('templateCards/', '')
+            path = path.replace('.PNG', '')
+            return path
+            break
 
 
 while True:
