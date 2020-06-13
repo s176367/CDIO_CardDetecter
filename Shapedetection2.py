@@ -9,15 +9,15 @@ import numpy as np
 # https://www.murtazahassan.com/real-time-contours-shape-detection/
 
 
-framewidth = 640
-frameheight = 480
+framewidth = 1920
+frameheight = 1080
 
 ref_point = []
 crop = False
 
-cap = cv2.VideoCapture(0)
-cap.set(3, framewidth)
-cap.set(4, frameheight)
+cap = cv2.VideoCapture(cv2.CAP_DSHOW + 1)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, framewidth)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, frameheight)
 
 coordinates = []
 
@@ -138,8 +138,9 @@ def warpPicture(y, x , w, h, img):
     matrix = cv2.getPerspectiveTransform(pts1, pts2)
     output = cv2.warpPerspective(img, matrix, (width, height))
     #checkAfAlle(output)
-    print(checkAfAlle(output))
+    #print(checkAfAlle(output))
     cv2.imwrite('warpedPicture' + str(counter) + '.jpg', output)
+    print('billede printet')
     cv2.imshow('warpedPicture' + str(counter), output)
 
 
@@ -197,10 +198,11 @@ while True:
 
     getContours(imgDil, imgContour, img)
 
-    imgstack = stackImages(0.8, ([img, imgGray, imgCanny], [imgDil, imgContour, imgWarp]))
-    cv2.imshow("result", imgstack)
+    #imgstack = stackImages(0.8, ([img, imgGray, imgCanny], [imgDil, imgContour, imgWarp]))
+    cv2.imshow("result", imgContour)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
 cv2.destroyAllWindows()
+cap.release()
