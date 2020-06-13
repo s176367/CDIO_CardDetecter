@@ -141,6 +141,8 @@ def warpPicture(x, y, w, h, img):
     cv2.imshow('warpedPicture' + str(counter), output)
 
 
+
+
 while True:
     success, img = cap.read()
 

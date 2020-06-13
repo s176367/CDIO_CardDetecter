@@ -8,7 +8,7 @@ def checkAfSpecifiktKort(img, template):
     gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     w, h = template.shape[::-1]
     result = cv2.matchTemplate(gray_img, template, cv2.TM_CCOEFF_NORMED)
-    loc = np.where(result >= 0.97)
+    loc = np.where(result >= 0.90)
 
     for pt in zip(*loc[::-1]):
         cv2.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0, 255, 0), 3)
@@ -41,6 +41,6 @@ def checkAfAlle(img):
 
 
 
-img = cv2.imread("Ressources/warpedPicture47.jpg")
+img = cv2.imread("Ressources/hearts/warpedPicture42.jpg")
 
 print(checkAfAlle(img))
