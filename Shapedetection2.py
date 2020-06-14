@@ -138,9 +138,9 @@ def warpPicture(y, x , w, h, img):
     matrix = cv2.getPerspectiveTransform(pts1, pts2)
     output = cv2.warpPerspective(img, matrix, (width, height))
     #checkAfAlle(output)
-    #print(checkAfAlle(output))
-    cv2.imwrite('warpedPicture' + str(counter) + '.jpg', output)
-    print('billede printet')
+    print(checkAfAlle(output))
+    #cv2.imwrite('warpedPicture' + str(counter) + '.jpg', output)
+
     cv2.imshow('warpedPicture' + str(counter), output)
 
 
@@ -148,7 +148,7 @@ def checkAfSpecifiktKort(img, template):
     gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     w, h = template.shape[::-1]
     result = cv2.matchTemplate(gray_img, template, cv2.TM_CCOEFF_NORMED)
-    loc = np.where(result >= 0.97)
+    loc = np.where(result >= 0.85)
 
     for pt in zip(*loc[::-1]):
         cv2.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0, 255, 0), 3)
