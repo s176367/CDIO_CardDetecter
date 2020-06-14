@@ -19,6 +19,9 @@ cap = cv2.VideoCapture(cv2.CAP_DSHOW + 1)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, framewidth)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, frameheight)
 
+
+
+
 coordinates = []
 
 
@@ -75,30 +78,32 @@ def stackImages(scale, imgArray):  # metode herfra https://www.murtazahassan.com
 def getContours(img, imgContour, standardimg):
     global counter, string
     contours, hierachy = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    cv2.drawContours(imgContour, contours, -1, (255, 0, 255), 3)
+
+    if cv2.waitKey(1) & 0xFF == ord('c'):
+        for contour in contours:
+            area = cv2.contourArea(contour)
+            areaMin = cv2.getTrackbarPos("area", "parameters")
+
+            if area > areaMin:
+                peri = cv2.arcLength(contour, True)
+                approx = cv2.approxPolyDP(contour, 0.02 * peri, True)
+                box = np.int0(approx)
 
 
-    for contour in contours:
-        area = cv2.contourArea(contour)
-        areaMin = cv2.getTrackbarPos("area", "parameters")
-        if area > areaMin:
-            peri = cv2.arcLength(contour, True)
-            approx = cv2.approxPolyDP(contour, 0.02 * peri, True)
-            box = np.int0(approx)
 
 
-            cv2.drawContours(imgContour, box, -1, (255, 0, 255), 5)
+                if len(approx) == 4:
+                    x, y, w, h = cv2.boundingRect(approx)
 
-            if len(approx) == 4:
-                x, y, w, h = cv2.boundingRect(approx)
+                    # cv2.putText(imgContour, "Points: " + str(len(approx)), (x + w + 20, y + 20), cv2.FONT_HERSHEY_COMPLEX,
+                    # 0.7, (0, 255, 0), 2)
+                    # cv2.putText(imgContour, "Area: " + str(int(area)), (x + w + 20, y + 45), cv2.FONT_HERSHEY_COMPLEX, 0.7,
+                    #        (0, 255, 0), 2)
 
-                # cv2.putText(imgContour, "Points: " + str(len(approx)), (x + w + 20, y + 20), cv2.FONT_HERSHEY_COMPLEX,
-                # 0.7, (0, 255, 0), 2)
-                # cv2.putText(imgContour, "Area: " + str(int(area)), (x + w + 20, y + 45), cv2.FONT_HERSHEY_COMPLEX, 0.7,
-                #        (0, 255, 0), 2)
 
-                if cv2.waitKey(1) & 0xFF == ord('c'):
                     counter = counter + 1
-
+                    print(box)
                     imgstatic = cv2.imread('warpedPicture' + str(counter) + '.jpg')
                     coordinates.insert(0, x)
                     coordinates.insert(1, y)
@@ -107,28 +112,28 @@ def getContours(img, imgContour, standardimg):
                     warpPic = standardimg.copy()
                     warpPicture(box[0], box[1], box[2], box[3], warpPic)
 
-            else:
-                x, y, w, h = cv2.boundingRect(approx)
-                cv2.putText(imgContour,
-                            "Ret kort indtil",
-                            (x + w + 20, y + 20),
-                            cv2.FONT_HERSHEY_COMPLEX, 0.7,
-                            (0, 255, 0), 2)
-                cv2.putText(imgContour,
-                            "green firkant vises ",
-                            (x + w + 20, y + 45),
-                            cv2.FONT_HERSHEY_COMPLEX, 0.7,
-                            (0, 255, 0), 2)
-                cv2.putText(imgContour,
-                            "MAKS 4 Corners ",
-                            (x + w + 20, y + 65),
-                            cv2.FONT_HERSHEY_COMPLEX, 0.7,
-                            (0, 255, 0), 2)
-                cv2.putText(imgContour,
-                            "Antal Corners " + str(len(approx)),
-                            (x + w + 20, y + 85),
-                            cv2.FONT_HERSHEY_COMPLEX, 0.7,
-                            (0, 255, 0), 2)
+                else:
+                    x, y, w, h = cv2.boundingRect(approx)
+                    cv2.putText(imgContour,
+                                "Ret kort indtil",
+                                (x + w + 20, y + 20),
+                                cv2.FONT_HERSHEY_COMPLEX, 0.7,
+                                (0, 255, 0), 2)
+                    cv2.putText(imgContour,
+                                "green firkant vises ",
+                                (x + w + 20, y + 45),
+                                cv2.FONT_HERSHEY_COMPLEX, 0.7,
+                                (0, 255, 0), 2)
+                    cv2.putText(imgContour,
+                                "MAKS 4 Corners ",
+                                (x + w + 20, y + 65),
+                                cv2.FONT_HERSHEY_COMPLEX, 0.7,
+                                (0, 255, 0), 2)
+                    cv2.putText(imgContour,
+                                "Antal Corners " + str(len(approx)),
+                                (x + w + 20, y + 85),
+                                cv2.FONT_HERSHEY_COMPLEX, 0.7,
+                                (0, 255, 0), 2)
 
 
 def warpPicture(y, x , w, h, img):
@@ -138,7 +143,7 @@ def warpPicture(y, x , w, h, img):
     matrix = cv2.getPerspectiveTransform(pts1, pts2)
     output = cv2.warpPerspective(img, matrix, (width, height))
     #checkAfAlle(output)
-    print(checkAfAlle(output))
+    #print(checkAfAlle(output))
     #cv2.imwrite('warpedPicture' + str(counter) + '.jpg', output)
 
     cv2.imshow('warpedPicture' + str(counter), output)
@@ -183,16 +188,18 @@ def checkAfAlle(img):
 while True:
     success, img = cap.read()
 
+
     imgContour = img.copy()
     imgWarp = imgContour.copy()
+    cv2.rectangle(imgContour, (300, 75), (650, 425), (0, 255, 0), 2)
 
     imgBlur = cv2.GaussianBlur(img, (7, 7), 3)
     imgGray = cv2.cvtColor(imgBlur, cv2.COLOR_BGR2GRAY)
 
-    threshold1 = cv2.getTrackbarPos("Threshold1", "parameters")
-    threshold2 = cv2.getTrackbarPos("Threshold2", "parameters")
+    #threshold1 = cv2.getTrackbarPos("Threshold1", "parameters")
+    #threshold2 = cv2.getTrackbarPos("Threshold2", "parameters")
 
-    imgCanny = cv2.Canny(imgGray, threshold1, threshold2)
+    imgCanny = cv2.Canny(imgGray, 120, 120)
     kernel = np.ones((5, 5))
     imgDil = cv2.dilate(imgCanny, kernel, iterations=1)
 
