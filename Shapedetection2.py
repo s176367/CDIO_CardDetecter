@@ -15,7 +15,7 @@ frameheight = 1080
 ref_point = []
 crop = False
 
-cap = cv2.VideoCapture(cv2.CAP_DSHOW + 1)
+cap = cv2.VideoCapture(cv2.CAP_DSHOW )
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, framewidth)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, frameheight)
 
@@ -77,63 +77,73 @@ def stackImages(scale, imgArray):  # metode herfra https://www.murtazahassan.com
 
 def getContours(img, imgContour, standardimg):
     global counter, string
-    contours, hierachy = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-    cv2.drawContours(imgContour, contours, -1, (255, 0, 255), 3)
+
+    roiDeck1 = img[500 + 1:1070 - 1, 1 + 1:240 - 1]
+    roiDeck2 = img[500 + 1:1070 - 1, 280 + 1:520 - 1]
+    roiDeck3 = img[500 + 1:1070 - 1, 560 + 1:800 - 1]
+    roiDeck4 = img[500 + 1:1070 - 1, 840 + 1:1080 - 1]
+    roiDeck5 = img[500 + 1:1070 - 1, 1120 + 1:1360 - 1]
+    roiDeck6 = img[500 + 1:1070 - 1, 1400 + 1:1640 - 1]
+    roiDeck7 = img[500 + 1:1070 - 1, 1680 + 1:1918 - 1]
+    roiDiscard = img[1 + 1:400 - 1, 280 + 1:520 - 1]
+    decks = [roiDeck1,roiDeck2,roiDeck3,roiDeck3,roiDeck4,roiDeck5,roiDeck6,roiDeck7,roiDiscard]
+
+    for x in decks:
+        contours, hierachy = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+        cv2.drawContours(imgContour, contours, -1, (255, 0, 255), 3)
 
     if cv2.waitKey(1) & 0xFF == ord('c'):
-        for contour in contours:
-            area = cv2.contourArea(contour)
-            areaMin = cv2.getTrackbarPos("area", "parameters")
+        for x in decks:
+            for contour in contours:
+                area = cv2.contourArea(contour)
+                areaMin = cv2.getTrackbarPos("area", "parameters")
 
-            if area > areaMin:
-                peri = cv2.arcLength(contour, True)
-                approx = cv2.approxPolyDP(contour, 0.02 * peri, True)
-                box = np.int0(approx)
+                if area > areaMin:
+                    peri = cv2.arcLength(contour, True)
+                    approx = cv2.approxPolyDP(contour, 0.02 * peri, True)
+                    box = np.int0(approx)
 
+                    if len(approx) == 4:
+                        x, y, w, h = cv2.boundingRect(approx)
 
-
-
-                if len(approx) == 4:
-                    x, y, w, h = cv2.boundingRect(approx)
-
-                    # cv2.putText(imgContour, "Points: " + str(len(approx)), (x + w + 20, y + 20), cv2.FONT_HERSHEY_COMPLEX,
-                    # 0.7, (0, 255, 0), 2)
-                    # cv2.putText(imgContour, "Area: " + str(int(area)), (x + w + 20, y + 45), cv2.FONT_HERSHEY_COMPLEX, 0.7,
-                    #        (0, 255, 0), 2)
+                        # cv2.putText(imgContour, "Points: " + str(len(approx)), (x + w + 20, y + 20), cv2.FONT_HERSHEY_COMPLEX,
+                        # 0.7, (0, 255, 0), 2)
+                        # cv2.putText(imgContour, "Area: " + str(int(area)), (x + w + 20, y + 45), cv2.FONT_HERSHEY_COMPLEX, 0.7,
+                        #        (0, 255, 0), 2)
 
 
-                    counter = counter + 1
-                    print(box)
-                    imgstatic = cv2.imread('warpedPicture' + str(counter) + '.jpg')
-                    coordinates.insert(0, x)
-                    coordinates.insert(1, y)
-                    coordinates.insert(2, h)
-                    coordinates.insert(3, w)
-                    warpPic = standardimg.copy()
-                    warpPicture(box[0], box[1], box[2], box[3], warpPic)
+                        counter = counter + 1
+                        print(box)
+                        imgstatic = cv2.imread('warpedPicture' + str(counter) + '.jpg')
+                        coordinates.insert(0, x)
+                        coordinates.insert(1, y)
+                        coordinates.insert(2, h)
+                        coordinates.insert(3, w)
+                        warpPic = standardimg.copy()
+                        warpPicture(box[0], box[1], box[2], box[3], warpPic)
 
-                else:
-                    x, y, w, h = cv2.boundingRect(approx)
-                    cv2.putText(imgContour,
-                                "Ret kort indtil",
-                                (x + w + 20, y + 20),
-                                cv2.FONT_HERSHEY_COMPLEX, 0.7,
-                                (0, 255, 0), 2)
-                    cv2.putText(imgContour,
-                                "green firkant vises ",
-                                (x + w + 20, y + 45),
-                                cv2.FONT_HERSHEY_COMPLEX, 0.7,
-                                (0, 255, 0), 2)
-                    cv2.putText(imgContour,
-                                "MAKS 4 Corners ",
-                                (x + w + 20, y + 65),
-                                cv2.FONT_HERSHEY_COMPLEX, 0.7,
-                                (0, 255, 0), 2)
-                    cv2.putText(imgContour,
-                                "Antal Corners " + str(len(approx)),
-                                (x + w + 20, y + 85),
-                                cv2.FONT_HERSHEY_COMPLEX, 0.7,
-                                (0, 255, 0), 2)
+                    else:
+                        x, y, w, h = cv2.boundingRect(approx)
+                        cv2.putText(imgContour,
+                                    "Ret kort indtil",
+                                    (x + w + 20, y + 20),
+                                    cv2.FONT_HERSHEY_COMPLEX, 0.7,
+                                    (0, 255, 0), 2)
+                        cv2.putText(imgContour,
+                                    "green firkant vises ",
+                                    (x + w + 20, y + 45),
+                                    cv2.FONT_HERSHEY_COMPLEX, 0.7,
+                                    (0, 255, 0), 2)
+                        cv2.putText(imgContour,
+                                    "MAKS 4 Corners ",
+                                    (x + w + 20, y + 65),
+                                    cv2.FONT_HERSHEY_COMPLEX, 0.7,
+                                    (0, 255, 0), 2)
+                        cv2.putText(imgContour,
+                                    "Antal Corners " + str(len(approx)),
+                                    (x + w + 20, y + 85),
+                                    cv2.FONT_HERSHEY_COMPLEX, 0.7,
+                                    (0, 255, 0), 2)
 
 
 def warpPicture(y, x , w, h, img):
@@ -184,18 +194,24 @@ def checkAfAlle(img):
             return path
             break
 
-
 while True:
     success, img = cap.read()
-
-
     imgContour = img.copy()
     imgWarp = imgContour.copy()
-    cv2.rectangle(imgContour, (300, 75), (650, 425), (0, 255, 0), 2)
+    cv2.rectangle(img, (1, 1070), (240, 500), (255, 0, 0), 2)
+    cv2.rectangle(img, (280, 1070), (520, 500), (255, 0, 0), 2)
+    cv2.rectangle(img, (560, 1070), (800, 500), (255, 0, 0), 2)
+    cv2.rectangle(img, (840, 1070), (1080, 500), (255, 0, 0), 2)
+    cv2.rectangle(img, (1120, 1070), (1360, 500), (255, 0, 0), 2)
+    cv2.rectangle(img, (1400, 1070), (1640, 500), (255, 0, 0), 2)
+    cv2.rectangle(img, (1680, 1070), (1918, 500), (255, 0, 0), 2)
+    cv2.rectangle(img, (700, 1), (1918, 400), (255, 0, 0), 2)
+    cv2.rectangle(img, (520, 1), (280, 400), (255, 0, 0), 2)
+
+
 
     imgBlur = cv2.GaussianBlur(img, (7, 7), 3)
     imgGray = cv2.cvtColor(imgBlur, cv2.COLOR_BGR2GRAY)
-
     #threshold1 = cv2.getTrackbarPos("Threshold1", "parameters")
     #threshold2 = cv2.getTrackbarPos("Threshold2", "parameters")
 
@@ -207,9 +223,7 @@ while True:
 
     #imgstack = stackImages(0.8, ([img, imgGray, imgCanny], [imgDil, imgContour, imgWarp]))
     cv2.imshow("result", imgContour)
-
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
-
 cv2.destroyAllWindows()
 cap.release()
