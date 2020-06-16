@@ -15,7 +15,7 @@ frameheight = 1080
 ref_point = []
 crop = False
 
-cap = cv2.VideoCapture(cv2.CAP_DSHOW )
+cap = cv2.VideoCapture(cv2.CAP_DSHOW+1)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, framewidth)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, frameheight)
 
@@ -88,12 +88,12 @@ def getContours(img, imgContour, standardimg):
     roiDiscard = img[1 + 1:400 - 1, 280 + 1:520 - 1]
     decks = [roiDeck1,roiDeck2,roiDeck3,roiDeck3,roiDeck4,roiDeck5,roiDeck6,roiDeck7,roiDiscard]
 
-    for x in decks:
-        contours, hierachy = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-        cv2.drawContours(imgContour, contours, -1, (255, 0, 255), 3)
+    # for x in decks:
+    contours, hierachy = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    cv2.drawContours(imgContour, contours, -1, (255, 0, 255), 3)
 
     if cv2.waitKey(1) & 0xFF == ord('c'):
-        for x in decks:
+        # for x in decks:
             for contour in contours:
                 area = cv2.contourArea(contour)
                 areaMin = cv2.getTrackbarPos("area", "parameters")
