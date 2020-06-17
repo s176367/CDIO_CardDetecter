@@ -159,40 +159,41 @@ def warpPicture(y, x , w, h, img):
     cv2.imshow('warpedPicture' + str(counter), output)
 
 
-def checkAfSpecifiktKort(img, template):
-    gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    w, h = template.shape[::-1]
-    result = cv2.matchTemplate(gray_img, template, cv2.TM_CCOEFF_NORMED)
-    loc = np.where(result >= 0.85)
+def checkAfkort (img, template):
+    img1 = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+    template1 = cv2.cvtColor(template, cv2.COLOR_RGB2GRAY)
+    # cv2.imshow('tresh1', img1)
+    # cv2.imshow('tresh2', template1)
 
-    for pt in zip(*loc[::-1]):
-        cv2.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0, 255, 0), 3)
-        return True
-    else:
-        print("No simmilarity found")
-        return False
-
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
+    ret,thresh1 = cv2.threshold(img1, 122, 230, cv2.THRESH_BINARY)
+    ret,thresh11 = cv2.threshold(template1, 122, 230, cv2.THRESH_BINARY)
+    bitwise = cv2.bitwise_xor(thresh1, thresh11)
+    # cv2.imshow('tresh1',thresh1)
+    # cv2.imshow('tresh2', thresh11)
+    # cv2.imshow('bitwise',bitwise)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
+    print (cv2.countNonZero(bitwise))
+    return (cv2.countNonZero(bitwise))
 
 
 def checkAfAlle(img):
     path = "templateCards/"
-
+    bestmatch = 10000000000
+    pathforCard = ''
     # Iterer igennem alle templates
     for image_path in os.listdir(path):
 
         #Finder kortet
         input_path = os.path.join(path, image_path)
-        template = cv2.imread(input_path, cv2.IMREAD_GRAYSCALE)
+        template = cv2.imread(input_path)
 
+        nuværendematch = checkAfkort(img, template)
         # Køre checkAfSpecifiktKort
-        if checkAfSpecifiktKort(img, template) == True:
-            path = input_path.replace('templateCards/', '')
-            path = path.replace('.PNG', '')
-            return path
-            break
+        if nuværendematch < bestmatch:
+            pathforCard =  input_path.replace('test/', '')
+            bestmatch = nuværendematch
+    return bestmatch,pathforCard
 
 while True:
     success, img = cap.read()

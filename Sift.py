@@ -6,14 +6,14 @@ from matplotlib import pyplot as plt
 
 def checkAfkort(img1,template):
 
-    # Initiate SIFT detector
+
     orb = cv2.ORB_create()
 
-    # find the keypoints and descriptors with SIFT
+
     kp1, des1 = orb.detectAndCompute(img1,None)
     kp2, des2 = orb.detectAndCompute(template,None)
 
-    # FLANN parameters
+
     FLANN_INDEX_KDTREE = 0
     index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
     search_params = dict(checks=50)   # or pass empty dictionary
@@ -25,7 +25,7 @@ def checkAfkort(img1,template):
 
     matches = flann.knnMatch(des1,des2,k=2)
 
-    # Need to draw only good matches, so create a mask
+
     matchesMask = [[0,0] for i in range(len(matches))]
 
     # ratio test as per Lowe's paper

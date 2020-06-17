@@ -4,8 +4,8 @@ import numpy as np
 import cv2
 from matplotlib import pyplot as plt
 
-img1 = cv2.imread('templateCards/warpedPicture33.jpg', 0)  # queryImage
-template = cv2.imread('templateCards/warpedPicture53.jpg', 0)  # trainImage
+img1 = cv2.imread('templateCards/warpedPicture29.jpg', 0)  # queryImage
+template = cv2.imread('templateCards/warpedPicture7.jpg', 0)  # trainImage
 # Initiate SIFT detector
 print(template)
 orb = cv2.ORB_create()

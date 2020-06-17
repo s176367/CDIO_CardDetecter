@@ -46,6 +46,6 @@ def checkAfAlle(img):
 
 
 
-img = cv2.imread('warpedPicture6.jpg')
+img = cv2.imread('warpedPicture17.jpg')
 
 print(checkAfAlle(img))
