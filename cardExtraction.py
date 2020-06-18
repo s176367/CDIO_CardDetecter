@@ -6,6 +6,7 @@ img = cv2.imread('opencvSnap.jpg', cv2.IMREAD_COLOR)
 
 img2 = cv2.imread('opencvSnap.jpg', cv2.IMREAD_GRAYSCALE)
 
+
 blurred = cv2.GaussianBlur(img2, (9, 9), 9)
 
 _, threshold = cv2.threshold(blurred, 50, 60, cv2.THRESH_BINARY)

@@ -3,6 +3,7 @@ import cv2
 import os
 import imutils as imutils
 import numpy as np
+from operator import itemgetter
 
 # Dette project er udarbejdet fra denne vejledning: https://www.youtube.com/watch?v=Fchzk1lDt7Q
 # Der er derfor nogle metoder derfra som er taget fra denne hjemmeside fremvist i vejledningsvideoen:
@@ -76,7 +77,7 @@ def stackImages(scale, imgArray):  # metode herfra https://www.murtazahassan.com
 
 
 def getContours(img, imgContour, standardimg):
-    global counter, string
+    global counter, string, contours
 
     roiDeck1 = img[500 + 1:1070 - 1, 1 + 1:240 - 1]
     roiDeck2 = img[500 + 1:1070 - 1, 280 + 1:520 - 1]
@@ -88,12 +89,13 @@ def getContours(img, imgContour, standardimg):
     roiDiscard = img[1 + 1:400 - 1, 280 + 1:520 - 1]
     decks = [roiDeck1,roiDeck2,roiDeck3,roiDeck3,roiDeck4,roiDeck5,roiDeck6,roiDeck7,roiDiscard]
 
-    # for x in decks:
+    #for x in decks:
     contours, hierachy = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-    cv2.drawContours(imgContour, contours, -1, (255, 0, 255), 3)
+    cv2.drawContours(imgContour, contours, -1, (255, 0, 255), 1)
 
     if cv2.waitKey(1) & 0xFF == ord('c'):
-        # for x in decks:
+
+         #for x in decks:
             for contour in contours:
                 area = cv2.contourArea(contour)
                 areaMin = cv2.getTrackbarPos("area", "parameters")
@@ -103,42 +105,21 @@ def getContours(img, imgContour, standardimg):
                     approx = cv2.approxPolyDP(contour, 0.02 * peri, True)
                     box = np.int0(approx)
 
+
+
+
                     if len(approx) == 4:
-                        x, y, w, h = cv2.boundingRect(approx)
-
-                        # cv2.putText(imgContour, "Points: " + str(len(approx)), (x + w + 20, y + 20), cv2.FONT_HERSHEY_COMPLEX,
-                        # 0.7, (0, 255, 0), 2)
-                        # cv2.putText(imgContour, "Area: " + str(int(area)), (x + w + 20, y + 45), cv2.FONT_HERSHEY_COMPLEX, 0.7,
-                        #        (0, 255, 0), 2)
-
-
                         counter = counter + 1
-                        print(box)
-                        imgstatic = cv2.imread('warpedPicture' + str(counter) + '.jpg')
-                        coordinates.insert(0, x)
-                        coordinates.insert(1, y)
-                        coordinates.insert(2, h)
-                        coordinates.insert(3, w)
                         warpPic = standardimg.copy()
-                        warpPicture(box[0], box[1], box[2], box[3], warpPic)
+                        if box[1][0][1]> box[3][0][1]:
+                            warpPicture(box[2], box[1], box[3], box[0], warpPic)
+
+                        elif box[3][0][1] > box[1][0][1]:
+                            warpPicture(box[1], box[0], box[2], box[3], warpPic)
+
 
                     else:
                         x, y, w, h = cv2.boundingRect(approx)
-                        cv2.putText(imgContour,
-                                    "Ret kort indtil",
-                                    (x + w + 20, y + 20),
-                                    cv2.FONT_HERSHEY_COMPLEX, 0.7,
-                                    (0, 255, 0), 2)
-                        cv2.putText(imgContour,
-                                    "green firkant vises ",
-                                    (x + w + 20, y + 45),
-                                    cv2.FONT_HERSHEY_COMPLEX, 0.7,
-                                    (0, 255, 0), 2)
-                        cv2.putText(imgContour,
-                                    "MAKS 4 Corners ",
-                                    (x + w + 20, y + 65),
-                                    cv2.FONT_HERSHEY_COMPLEX, 0.7,
-                                    (0, 255, 0), 2)
                         cv2.putText(imgContour,
                                     "Antal Corners " + str(len(approx)),
                                     (x + w + 20, y + 85),
@@ -146,17 +127,42 @@ def getContours(img, imgContour, standardimg):
                                     (0, 255, 0), 2)
 
 
-def warpPicture(y, x , w, h, img):
+def warpPicture(botRight, botLeft, topRight, topLeft, img):
     width, height, = 400, 400
-    pts1 = np.float32([x, y, w, h])
+    pts1 = np.float32([botRight, botLeft, topRight, topLeft])
     pts2 = np.float32([[0, 0], [width, 0], [0, height], [width, height]])
     matrix = cv2.getPerspectiveTransform(pts1, pts2)
     output = cv2.warpPerspective(img, matrix, (width, height))
     #checkAfAlle(output)
+    print(str(counter))
     #print(checkAfAlle(output))
-    #cv2.imwrite('warpedPicture' + str(counter) + '.jpg', output)
+    # cv2.imshow(''+ str(counter), output)
+    cv2.imwrite('warpedpicture' + str(counter) + '.jpg', output)
+    #print('warpedPicture' + str(counter))
 
-    cv2.imshow('warpedPicture' + str(counter), output)
+
+def antiflip(box):
+    # y1 = box[0][0][1]
+    # y2 = box[1][0][1]
+    # y3 = box[2][0][1]
+    # y4 = box[3][0][1]
+    cord1 = box[0][0]
+    cord2 = box[1][0]
+    cord3 = box[2][0]
+    cord4 = box[3][0]
+
+    ycords = [cord1[1], cord2[1], cord3[1], cord4[1]]
+    ycords.index(max(ycords))
+    rækkefølgeUdfraY = [box[ycords.index(max(ycords))]]
+    ycords.remove(max(ycords))
+    rækkefølgeUdfraY.append(box[ycords.index(max(ycords))])
+    ycords.remove(max(ycords))
+    rækkefølgeUdfraY.append(box[ycords.index(max(ycords))])
+    ycords.remove(max(ycords))
+    rækkefølgeUdfraY.append(box[ycords.index(max(ycords))])
+
+    return rækkefølgeUdfraY
+
 
 
 def checkAfkort (img, template):
@@ -165,15 +171,14 @@ def checkAfkort (img, template):
     # cv2.imshow('tresh1', img1)
     # cv2.imshow('tresh2', template1)
 
-    ret,thresh1 = cv2.threshold(img1, 122, 230, cv2.THRESH_BINARY)
-    ret,thresh11 = cv2.threshold(template1, 122, 230, cv2.THRESH_BINARY)
+    ret,thresh1 = cv2.threshold(img1, 190, 230, cv2.THRESH_BINARY)
+    ret,thresh11 = cv2.threshold(template1, 190, 230, cv2.THRESH_BINARY)
     bitwise = cv2.bitwise_xor(thresh1, thresh11)
     # cv2.imshow('tresh1',thresh1)
     # cv2.imshow('tresh2', thresh11)
     # cv2.imshow('bitwise',bitwise)
     # cv2.waitKey(0)
     # cv2.destroyAllWindows()
-    print (cv2.countNonZero(bitwise))
     return (cv2.countNonZero(bitwise))
 
 
@@ -199,28 +204,29 @@ while True:
     success, img = cap.read()
     imgContour = img.copy()
     imgWarp = imgContour.copy()
-    cv2.rectangle(img, (1, 1070), (240, 500), (255, 0, 0), 2)
-    cv2.rectangle(img, (280, 1070), (520, 500), (255, 0, 0), 2)
-    cv2.rectangle(img, (560, 1070), (800, 500), (255, 0, 0), 2)
-    cv2.rectangle(img, (840, 1070), (1080, 500), (255, 0, 0), 2)
-    cv2.rectangle(img, (1120, 1070), (1360, 500), (255, 0, 0), 2)
-    cv2.rectangle(img, (1400, 1070), (1640, 500), (255, 0, 0), 2)
-    cv2.rectangle(img, (1680, 1070), (1918, 500), (255, 0, 0), 2)
-    cv2.rectangle(img, (700, 1), (1918, 400), (255, 0, 0), 2)
-    cv2.rectangle(img, (520, 1), (280, 400), (255, 0, 0), 2)
+    cv2.rectangle(imgContour, (1, 1070), (240, 500), (255, 0, 0), 2)
+    cv2.rectangle(imgContour, (280, 1070), (520, 500), (255, 0, 0), 2)
+    cv2.rectangle(imgContour, (560, 1070), (800, 500), (255, 0, 0), 2)
+    cv2.rectangle(imgContour, (840, 1070), (1080, 500), (255, 0, 0), 2)
+    cv2.rectangle(imgContour, (1120, 1070), (1360, 500), (255, 0, 0), 2)
+    cv2.rectangle(imgContour, (1400, 1070), (1640, 500), (255, 0, 0), 2)
+    cv2.rectangle(imgContour, (1680, 1070), (1918, 500), (255, 0, 0), 2)
+    cv2.rectangle(imgContour, (700, 1), (1918, 400), (255, 0, 0), 2)
+    cv2.rectangle(imgContour, (520, 1), (280, 400), (255, 0, 0), 2)
 
 
 
     imgBlur = cv2.GaussianBlur(img, (7, 7), 3)
     imgGray = cv2.cvtColor(imgBlur, cv2.COLOR_BGR2GRAY)
-    #threshold1 = cv2.getTrackbarPos("Threshold1", "parameters")
-    #threshold2 = cv2.getTrackbarPos("Threshold2", "parameters")
+    threshold1 = cv2.getTrackbarPos("Threshold1", "parameters")
+    threshold2 = cv2.getTrackbarPos("Threshold2", "parameters")
 
-    imgCanny = cv2.Canny(imgGray, 120, 120)
+    imgCanny = cv2.Canny(imgGray, threshold1, threshold2)
     kernel = np.ones((5, 5))
     imgDil = cv2.dilate(imgCanny, kernel, iterations=1)
 
     getContours(imgDil, imgContour, img)
+
 
     #imgstack = stackImages(0.8, ([img, imgGray, imgCanny], [imgDil, imgContour, imgWarp]))
     cv2.imshow("result", imgContour)

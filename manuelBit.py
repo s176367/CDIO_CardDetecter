@@ -2,13 +2,15 @@ import cv2
 
 
 
-img = cv2.imread('warpedPicture92.jpg', cv2.IMREAD_GRAYSCALE)
-template = cv2.imread('templateCards/warpedPicture93.jpg', cv2.IMREAD_GRAYSCALE)
-template1 = cv2.imread('templateCards/warpedPicture100.jpg', cv2.IMREAD_GRAYSCALE)
+img = cv2.imread('test2.jpg', cv2.IMREAD_GRAYSCALE)
+template = cv2.imread('templateCards/warpedPicture3.jpg', cv2.IMREAD_GRAYSCALE)
+template1 = cv2.imread('templateCards/warpedPicture4.jpg', cv2.IMREAD_GRAYSCALE)
 
-ret,threshpic8 = cv2.threshold(img,122, 255,cv2.THRESH_BINARY)
-ret,threshpic7 = cv2.threshold(template,122, 255,cv2.THRESH_BINARY)
-ret,threshpic153 = cv2.threshold(template1,122, 255,cv2.THRESH_BINARY)
+cv2.imshow('template', template)
+
+ret,threshpic8 = cv2.threshold(img,190, 255,cv2.THRESH_BINARY)
+ret,threshpic7 = cv2.threshold(template, 190, 255, cv2.THRESH_BINARY)
+ret,threshpic153 = cv2.threshold(template1,190, 255,cv2.THRESH_BINARY)
 
 cv2.imshow('162',threshpic7)
 cv2.imshow('92',threshpic8)
