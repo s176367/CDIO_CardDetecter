@@ -1,0 +1,4 @@
+1-13 hjerter
+14-26 clubs
+27-39 spades
+40-52 diamonds
