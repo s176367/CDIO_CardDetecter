@@ -36,7 +36,7 @@ def checkAfAlle(img):
         nuværendematch = checkAfkort(img, template)
         # Køre checkAfSpecifiktKort
         if nuværendematch < bestmatch:
-            pathforCard =  input_path.replace('test/', '')
+            pathforCard =  input_path.replace('template/', '')
             bestmatch = nuværendematch
     return bestmatch,pathforCard
 

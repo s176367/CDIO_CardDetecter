@@ -3,7 +3,7 @@ import cv2
 import os
 import imutils as imutils
 import numpy as np
-from operator import itemgetter
+from switchForCards import dataForwarding
 
 # Dette project er udarbejdet fra denne vejledning: https://www.youtube.com/watch?v=Fchzk1lDt7Q
 # Der er derfor nogle metoder derfra som er taget fra denne hjemmeside fremvist i vejledningsvideoen:
@@ -64,8 +64,6 @@ def getContours(img, imgContour, standardimg):
 
         i = 0
 
-
-
         for x in decks:
             imgBlur = cv2.GaussianBlur(decks[i], (7, 7), 3)
 
@@ -74,17 +72,11 @@ def getContours(img, imgContour, standardimg):
             threshold2 = 175
             imgCanny = cv2.Canny(imgGray, threshold1, threshold2)
 
-
-
-
             kernel = np.ones((5, 5))
             imgDil = cv2.dilate(imgCanny, kernel, iterations=1)
             contours, hierachy = cv2.findContours(imgDil, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
             #cv2.drawContours(roiDeck1, contours, -1, (255, 0, 255), 1)
-
-
             for contour in contours:
-
                 area = cv2.contourArea(contour)
                 #areaMin = cv2.getTrackbarPos("area", "parameters")
                 areaMin = 40000
@@ -95,17 +87,19 @@ def getContours(img, imgContour, standardimg):
                     box = np.int0(approx)
 
 
-
                     if len(approx) == 4:
 
                         counter = counter + 1
-                        warpPic = standardimg.copy()
 
-                        if box[1][0][1]> box[3][0][1]:
-                            warpPicture(box[2], box[1], box[3], box[0], decks[i])
+                        if box[1][0][1] > box[3][0][1]:
+                            pathname = warpPicture(box[2], box[1], box[3], box[0], decks[i])
+                            print(pathname)
+                            dataForwarding(pathname, i)
 
                         elif box[3][0][1] > box[1][0][1]:
-                            warpPicture(box[1], box[0], box[2], box[3], decks[i])
+                            pathname = warpPicture(box[1], box[0], box[2], box[3], decks[i])
+                            print(pathname)
+                            dataForwarding(pathname, i)
 
 
                     else:
@@ -126,35 +120,12 @@ def warpPicture(botRight, botLeft, topRight, topLeft, img):
     output = cv2.warpPerspective(img, matrix, (width, height))
     #checkAfAlle(output)
     print(str(counter))
-    print(checkAfAlle(output))
     cv2.imshow(''+ str(counter), output)
-
-    #cv2.imwrite('templateCards/14_653.jpg', output)
-
+    return checkAfAlle(output)
+    #cv2.imwrite('warpedpicture' + str(counter+381) + '.jpg', output)
     #print('warpedPicture' + str(counter+266))
 
 
-def antiflip(box):
-    # y1 = box[0][0][1]
-    # y2 = box[1][0][1]
-    # y3 = box[2][0][1]
-    # y4 = box[3][0][1]
-    cord1 = box[0][0]
-    cord2 = box[1][0]
-    cord3 = box[2][0]
-    cord4 = box[3][0]
-
-    ycords = [cord1[1], cord2[1], cord3[1], cord4[1]]
-    ycords.index(max(ycords))
-    rækkefølgeUdfraY = [box[ycords.index(max(ycords))]]
-    ycords.remove(max(ycords))
-    rækkefølgeUdfraY.append(box[ycords.index(max(ycords))])
-    ycords.remove(max(ycords))
-    rækkefølgeUdfraY.append(box[ycords.index(max(ycords))])
-    ycords.remove(max(ycords))
-    rækkefølgeUdfraY.append(box[ycords.index(max(ycords))])
-
-    return rækkefølgeUdfraY
 
 
 
@@ -189,9 +160,10 @@ def checkAfAlle(img):
         nuværendematch = checkAfkort(img, template)
         # Køre checkAfSpecifiktKort
         if nuværendematch < bestmatch:
-            pathforCard =  input_path.replace('test/', '')
+            pathforCard =  input_path.replace('_/', '')
             bestmatch = nuværendematch
-    return bestmatch,pathforCard
+    print(bestmatch)
+    return pathforCard
 
 while True:
     success, img = cap.read()
@@ -227,3 +199,8 @@ while True:
         break
 cv2.destroyAllWindows()
 cap.release()
+
+
+
+
+
