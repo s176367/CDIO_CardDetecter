@@ -20,9 +20,6 @@ cap = cv2.VideoCapture(cv2.CAP_DSHOW+1)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, framewidth)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, frameheight)
 
-
-
-
 coordinates = []
 
 
@@ -137,7 +134,7 @@ def checkAfkort (img, template):
     bitwise = cv2.bitwise_xor(thresh1, thresh11)
     cv2.imshow('tresh1',thresh1)
     #cv2.imshow('tresh2', thresh11)
-    # cv2.imshow('bitwise',bitwise)
+    #cv2.imshow('bitwise',bitwise)
     # cv2.waitKey(0)
     # cv2.destroyAllWindows()
     return (cv2.countNonZero(bitwise))
@@ -157,7 +154,7 @@ def checkAfAlle(img):
         nuværendematch = checkAfkort(img, template)
         # Køre checkAfSpecifiktKort
         if nuværendematch < bestmatch:
-            pathforCard =  input_path.replace('templateCards', '')
+            pathforCard = input_path.replace('templateCards', '')
             pathforCard1 = pathforCard.split("_", 1)
             bestmatch = nuværendematch
     print(bestmatch)

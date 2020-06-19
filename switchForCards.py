@@ -1,12 +1,13 @@
 from PythonSocket import *
 
 
-def dataForwarding(pathName, indexOfDeck):
+def dataForwarding(pathName):
 
     if pathName == '1':
         card = Card(0, 2)
         deckPile.append(card)
         print('Ace of hearts')
+        print(deckPile[0])
         return
 
     elif pathName == '2':
