@@ -16,7 +16,7 @@ frameheight = 1080
 ref_point = []
 crop = False
 
-cap = cv2.VideoCapture(cv2.CAP_DSHOW+0)
+cap = cv2.VideoCapture(cv2.CAP_DSHOW+1)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, framewidth)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, frameheight)
 
@@ -129,7 +129,8 @@ def warpPicture(botRight, botLeft, topRight, topLeft, img):
     print(checkAfAlle(output))
     cv2.imshow(''+ str(counter), output)
 
-    #cv2.imwrite('warpedpicture' + str(counter+381) + '.jpg', output)
+    #cv2.imwrite('templateCards/14_653.jpg', output)
+
     #print('warpedPicture' + str(counter+266))
 
 
