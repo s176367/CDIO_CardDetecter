@@ -3,10 +3,10 @@ from PythonSocket import *
 
 def dataForwarding(pathName, indexOfDeck):
 
-
     if pathName == '1':
         card = Card(0, 2)
         deckPile.append(card)
+        print('Ace of hearts')
         return
 
     elif pathName == '2':

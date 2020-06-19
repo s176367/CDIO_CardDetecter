@@ -85,8 +85,6 @@ def getContours(img, imgContour, standardimg):
                     peri = cv2.arcLength(contour, True)
                     approx = cv2.approxPolyDP(contour, 0.02 * peri, True)
                     box = np.int0(approx)
-
-
                     if len(approx) == 4:
 
                         counter = counter + 1
@@ -100,7 +98,6 @@ def getContours(img, imgContour, standardimg):
                             pathname = warpPicture(box[1], box[0], box[2], box[3], decks[i])
                             print(pathname)
                             dataForwarding(pathname, i)
-
 
                     else:
                         x, y, w, h = cv2.boundingRect(approx)
@@ -160,10 +157,11 @@ def checkAfAlle(img):
         nuværendematch = checkAfkort(img, template)
         # Køre checkAfSpecifiktKort
         if nuværendematch < bestmatch:
-            pathforCard =  input_path.replace('_/', '')
+            pathforCard =  input_path.replace('templateCards', '')
+            pathforCard1 = pathforCard.split("_", 1)
             bestmatch = nuværendematch
     print(bestmatch)
-    return pathforCard
+    return pathforCard1
 
 while True:
     success, img = cap.read()
