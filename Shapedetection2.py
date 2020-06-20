@@ -112,13 +112,13 @@ def warpPicture(botRight, botLeft, topRight, topLeft, img):
     matrix = cv2.getPerspectiveTransform(pts1, pts2)
     output = cv2.warpPerspective(img, matrix, (width, height))
     # checkAfAlle(output)
-    #print(str(counter))
-    #cv2.imshow('' + str(counter), output)cc
+    print(str(counter))
+    cv2.imshow('' + str(counter), output)
 
-    cv2.imwrite('clubs_' + str(counter) + '.jpg', output)
-    # print('warpedPicture' + str(counter+266))
-    #return checkAfAlle(output)
-    return str('der er blevet taget et billed')
+    #cv2.imwrite('skiftnavn_' + str(counter) + '.jpg', output)
+    #print('warpedPicture' + str(counter+266))
+    return checkAfAlle(output)
+    #return str('der er blevet taget et billed')
 
 
 def checkAfkort(img, template):
@@ -127,8 +127,8 @@ def checkAfkort(img, template):
     #cv2.imshow('tresh1', img1)
     #cv2.imshow('tresh2'+str(counter), template1)
 
-    ret, thresh1 = cv2.threshold(img1, 170, 230, cv2.THRESH_BINARY)
-    ret, thresh2 = cv2.threshold(template1, 150, 230, cv2.THRESH_BINARY)
+    ret, thresh1 = cv2.threshold(img1, 170, 250, cv2.THRESH_BINARY)
+    ret, thresh2 = cv2.threshold(template1, 170, 250, cv2.THRESH_BINARY)
     bitwise = cv2.bitwise_xor(thresh1, thresh2)
     #cv2.imshow('tresh1'+str(counter), thresh1)
     #cv2.imshow('tresh2', thresh2)

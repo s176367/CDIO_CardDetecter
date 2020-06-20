@@ -2,17 +2,18 @@ import cv2
 
 
 
-img = cv2.imread('templateBinary/18_1.jpg', cv2.IMREAD_GRAYSCALE)
-template = cv2.imread('templateBinary/18_3.jpg', cv2.IMREAD_GRAYSCALE)
-template1 = cv2.imread('templateBinary/31_4.jpg', cv2.IMREAD_GRAYSCALE)
+img = cv2.imread('templateCards/18_1.jpg', cv2.IMREAD_GRAYSCALE)
+template = cv2.imread('templateCards/41_1.jpg', cv2.IMREAD_GRAYSCALE)
+template1 = cv2.imread('templateCards/42.jpg', cv2.IMREAD_GRAYSCALE)
 
 ret, thresh1 = cv2.threshold(img, 170, 250, cv2.THRESH_BINARY)
-ret, thresh2 = cv2.threshold(template1, 150, 250, cv2.THRESH_BINARY)
+ret, thresh2 = cv2.threshold(template, 170, 250, cv2.THRESH_BINARY)
+ret, thresh3 = cv2.threshold(template1, 170, 250, cv2.THRESH_BINARY)
 
 
-cv2.imshow('template',template)
-cv2.imshow('img', thresh1)
-cv2.imshow('testpicture',thresh2)
+cv2.imshow('template',thresh1)
+cv2.imshow('img', thresh2)
+cv2.imshow('testpicture',thresh3)
 
 bitwise = cv2.bitwise_xor(template, img)
 bitwise1 = cv2.bitwise_xor(template, template1)
