@@ -11,7 +11,7 @@ frameheight = 1080
 ref_point = []
 crop = False
 
-cap = cv2.VideoCapture(cv2.CAP_DSHOW + 1)
+cap = cv2.VideoCapture(cv2.CAP_DSHOW + 0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, framewidth)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, frameheight)
 
@@ -43,6 +43,7 @@ def getContours(img, imgContour, standardimg):
     cv2.drawContours(imgContour, contours1, -1, (255, 0, 255), 1)
 
     if cv2.waitKey(1) & 0xFF == ord('c'):
+        roiDeck0 = standardimg[1 + 1:400 - 1, 600 + 1:920 - 1]
         roiDeck1 = standardimg[500 + 1:1070 - 1, 1 + 1:240 - 1]
         roiDeck2 = standardimg[500 + 1:1070 - 1, 280 + 1:520 - 1]
         roiDeck3 = standardimg[500 + 1:1070 - 1, 560 + 1:800 - 1]
@@ -51,21 +52,24 @@ def getContours(img, imgContour, standardimg):
         roiDeck6 = standardimg[500 + 1:1070 - 1, 1400 + 1:1640 - 1]
         roiDeck7 = standardimg[500 + 1:1070 - 1, 1680 + 1:1918 - 1]
         roiDiscard = standardimg[1 + 1:400 - 1, 280 + 1:520 - 1]
-        decks = [roiDeck1, roiDeck2, roiDeck3, roiDeck4, roiDeck5, roiDeck6, roiDeck7, roiDiscard]
+        decks = [roiDeck0, roiDeck1, roiDeck2, roiDeck3, roiDeck4, roiDeck5, roiDeck6, roiDeck7, roiDiscard]
 
         i = 0
 
         j = False
 
         for x in decks:
-            if i == 7 and j == False:
+            if i == 8 and j == False:
                 print(deckpile)
                 whileReact(deckpile)
                 deckpile.clear()
                 j = True
 
-            elif j:
+            elif j and len(deckpile) <1:
                 whileReact(deckpile)
+
+
+
             imgBlur = cv2.GaussianBlur(decks[i], (7, 7), 3)
 
             imgGray = cv2.cvtColor(imgBlur, cv2.COLOR_BGR2GRAY)
@@ -109,7 +113,7 @@ def getContours(img, imgContour, standardimg):
                                     (0, 255, 0), 2)
             i = i + 1
 
-            print(str(i) + 'det her er en test')
+
 
 
 def warpPicture(botRight, botLeft, topRight, topLeft, img):
@@ -120,7 +124,7 @@ def warpPicture(botRight, botLeft, topRight, topLeft, img):
     output = cv2.warpPerspective(img, matrix, (width, height))
     # checkAfAlle(output)
     #print(str(counter))
-    cv2.imshow('' + str(counter), output)
+    #cv2.imshow('' + str(counter), output)
 
     # cv2.imwrite('templateCards/1_234.jpg', output)
     # print('warpedPicture' + str(counter+266))
@@ -133,11 +137,11 @@ def checkAfkort(img, template):
     # cv2.imshow('tresh1', img1)
     # cv2.imshow('tresh2', template1)
 
-    ret, thresh1 = cv2.threshold(img1, 130, 230, cv2.THRESH_BINARY)
+    ret, thresh1 = cv2.threshold(img1, 170, 230, cv2.THRESH_BINARY)
     ret, thresh11 = cv2.threshold(template1, 150, 230, cv2.THRESH_BINARY)
     bitwise = cv2.bitwise_xor(thresh1, thresh11)
-    cv2.imshow('tresh1', thresh1)
-    # cv2.imshow('tresh2', thresh11)
+    #cv2.imshow('img'+ str(counter), thresh1)
+    #cv2.imshow('template'+ str(counter), thresh11)
     # cv2.imshow('bitwise',bitwise)
     # cv2.waitKey(0)
     # cv2.destroyAllWindows()
@@ -163,7 +167,6 @@ def checkAfAlle(img):
             finalstring = pathforCard1[0]
             bestmatch = nuværendematch
     print(bestmatch)
-    print(str(finalstring) + 'det her er finalstring')
     return finalstring
 
 
@@ -178,7 +181,8 @@ while True:
     cv2.rectangle(imgContour, (1120, 1070), (1360, 500), (255, 0, 0), 2)
     cv2.rectangle(imgContour, (1400, 1070), (1640, 500), (255, 0, 0), 2)
     cv2.rectangle(imgContour, (1680, 1070), (1918, 500), (255, 0, 0), 2)
-    cv2.rectangle(imgContour, (700, 1), (1918, 400), (255, 0, 0), 2)
+    cv2.rectangle(imgContour, (1000, 1), (1918, 400), (0, 255, 0), 2)
+    cv2.rectangle(imgContour, (600, 1), (900, 400), (0, 0, 255), 2)
     cv2.rectangle(imgContour, (520, 1), (280, 400), (255, 0, 0), 2)
 
     imgBlur = cv2.GaussianBlur(img, (7, 7), 3)
