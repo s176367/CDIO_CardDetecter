@@ -3,12 +3,7 @@ import cv2
 import os
 import imutils as imutils
 import numpy as np
-from switchForCards import dataForwarding
-
-# Dette project er udarbejdet fra denne vejledning: https://www.youtube.com/watch?v=Fchzk1lDt7Q
-# Der er derfor nogle metoder derfra som er taget fra denne hjemmeside fremvist i vejledningsvideoen:
-# https://www.murtazahassan.com/real-time-contours-shape-detection/
-
+from switchForCards import dataForwarding, whileReact, deckpile
 
 framewidth = 1920
 frameheight = 1080
@@ -16,7 +11,7 @@ frameheight = 1080
 ref_point = []
 crop = False
 
-cap = cv2.VideoCapture(cv2.CAP_DSHOW+1)
+cap = cv2.VideoCapture(cv2.CAP_DSHOW + 1)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, framewidth)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, frameheight)
 
@@ -40,7 +35,6 @@ threshold2 = cv2.getTrackbarPos("Threshold2", "Parameters")
 counter = 0
 
 
-
 def getContours(img, imgContour, standardimg):
     global counter, string, contours
 
@@ -61,7 +55,17 @@ def getContours(img, imgContour, standardimg):
 
         i = 0
 
+        j = False
+
         for x in decks:
+            if i == 7 and j == False:
+                print(deckpile)
+                whileReact(deckpile)
+                deckpile.clear()
+                j = True
+
+            elif j:
+                whileReact(deckpile)
             imgBlur = cv2.GaussianBlur(decks[i], (7, 7), 3)
 
             imgGray = cv2.cvtColor(imgBlur, cv2.COLOR_BGR2GRAY)
@@ -72,10 +76,10 @@ def getContours(img, imgContour, standardimg):
             kernel = np.ones((5, 5))
             imgDil = cv2.dilate(imgCanny, kernel, iterations=1)
             contours, hierachy = cv2.findContours(imgDil, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-            #cv2.drawContours(roiDeck1, contours, -1, (255, 0, 255), 1)
+            # cv2.drawContours(roiDeck1, contours, -1, (255, 0, 255), 1)
             for contour in contours:
                 area = cv2.contourArea(contour)
-                #areaMin = cv2.getTrackbarPos("area", "parameters")
+                # areaMin = cv2.getTrackbarPos("area", "parameters")
                 areaMin = 40000
 
                 if area > areaMin:
@@ -89,12 +93,12 @@ def getContours(img, imgContour, standardimg):
                         if box[1][0][1] > box[3][0][1]:
                             pathname = warpPicture(box[2], box[1], box[3], box[0], decks[i])
                             print(pathname)
-                            dataForwarding(pathname, i)
+                            dataForwarding(pathname)
 
                         elif box[3][0][1] > box[1][0][1]:
                             pathname = warpPicture(box[1], box[0], box[2], box[3], decks[i])
                             print(pathname)
-                            dataForwarding(pathname, i)
+                            dataForwarding(pathname)
 
                     else:
                         x, y, w, h = cv2.boundingRect(approx)
@@ -105,6 +109,8 @@ def getContours(img, imgContour, standardimg):
                                     (0, 255, 0), 2)
             i = i + 1
 
+            print(str(i) + 'det her er en test')
+
 
 def warpPicture(botRight, botLeft, topRight, topLeft, img):
     width, height, = 400, 400
@@ -112,29 +118,27 @@ def warpPicture(botRight, botLeft, topRight, topLeft, img):
     pts2 = np.float32([[0, 0], [width, 0], [0, height], [width, height]])
     matrix = cv2.getPerspectiveTransform(pts1, pts2)
     output = cv2.warpPerspective(img, matrix, (width, height))
-    #checkAfAlle(output)
-    print(str(counter))
-    cv2.imshow(''+ str(counter), output)
+    # checkAfAlle(output)
+    #print(str(counter))
+    cv2.imshow('' + str(counter), output)
+
+    # cv2.imwrite('templateCards/1_234.jpg', output)
+    # print('warpedPicture' + str(counter+266))
     return checkAfAlle(output)
-    #cv2.imwrite('warpedpicture' + str(counter+381) + '.jpg', output)
-    #print('warpedPicture' + str(counter+266))
 
 
-
-
-
-def checkAfkort (img, template):
+def checkAfkort(img, template):
     img1 = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
     template1 = cv2.cvtColor(template, cv2.COLOR_RGB2GRAY)
-    #cv2.imshow('tresh1', img1)
-    #cv2.imshow('tresh2', template1)
+    # cv2.imshow('tresh1', img1)
+    # cv2.imshow('tresh2', template1)
 
-    ret,thresh1 = cv2.threshold(img1, 170, 230, cv2.THRESH_BINARY)
-    ret,thresh11 = cv2.threshold(template1, 170, 230, cv2.THRESH_BINARY)
+    ret, thresh1 = cv2.threshold(img1, 130, 230, cv2.THRESH_BINARY)
+    ret, thresh11 = cv2.threshold(template1, 150, 230, cv2.THRESH_BINARY)
     bitwise = cv2.bitwise_xor(thresh1, thresh11)
-    cv2.imshow('tresh1',thresh1)
-    #cv2.imshow('tresh2', thresh11)
-    #cv2.imshow('bitwise',bitwise)
+    cv2.imshow('tresh1', thresh1)
+    # cv2.imshow('tresh2', thresh11)
+    # cv2.imshow('bitwise',bitwise)
     # cv2.waitKey(0)
     # cv2.destroyAllWindows()
     return (cv2.countNonZero(bitwise))
@@ -147,18 +151,21 @@ def checkAfAlle(img):
     # Iterer igennem alle templates
     for image_path in os.listdir(path):
 
-        #Finder kortet
+        # Finder kortet
         input_path = os.path.join(path, image_path)
         template = cv2.imread(input_path)
 
         nuværendematch = checkAfkort(img, template)
         # Køre checkAfSpecifiktKort
         if nuværendematch < bestmatch:
-            pathforCard = input_path.replace('templateCards', '')
+            pathforCard = input_path.replace('templateCards/', '')
             pathforCard1 = pathforCard.split("_", 1)
+            finalstring = pathforCard1[0]
             bestmatch = nuværendematch
     print(bestmatch)
-    return pathforCard1
+    print(str(finalstring) + 'det her er finalstring')
+    return finalstring
+
 
 while True:
     success, img = cap.read()
@@ -174,8 +181,6 @@ while True:
     cv2.rectangle(imgContour, (700, 1), (1918, 400), (255, 0, 0), 2)
     cv2.rectangle(imgContour, (520, 1), (280, 400), (255, 0, 0), 2)
 
-
-
     imgBlur = cv2.GaussianBlur(img, (7, 7), 3)
     imgGray = cv2.cvtColor(imgBlur, cv2.COLOR_BGR2GRAY)
     threshold1 = cv2.getTrackbarPos("Threshold1", "parameters")
@@ -187,15 +192,9 @@ while True:
 
     getContours(imgDil, imgContour, img)
 
-
-    #imgstack = stackImages(0.8, ([img, imgGray, imgCanny], [imgDil, imgContour, imgWarp]))
+    # imgstack = stackImages(0.8, ([img, imgGray, imgCanny], [imgDil, imgContour, imgWarp]))
     cv2.imshow("result", imgContour)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 cv2.destroyAllWindows()
 cap.release()
-
-
-
-
-
