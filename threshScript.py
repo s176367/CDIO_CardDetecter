@@ -4,7 +4,7 @@ import cv2
 
 path = "templateCards/"
 for image_path in os.listdir(path):
-    pathForSave = 'templateYes'
+
     # Finder kortet
     input_path = os.path.join(path, image_path)
     img = cv2.imread(input_path, cv2.IMREAD_GRAYSCALE)
@@ -33,37 +33,37 @@ for image_path in os.listdir(path):
     if cv2.waitKey(0) & 0xFF == ord('1'):
         cv2.imwrite(navn, threshpic1)
         print(navn)
-        print(pathForSave)
+
 
     elif cv2.waitKey(0) & 0xFF == ord('2'):
         cv2.imwrite(navn, threshpic2)
         print(navn)
-        print(pathForSave)
+
 
     elif cv2.waitKey(0) & 0xFF == ord('3'):
         cv2.imwrite(navn, threshpic3)
         print(navn)
-        print(pathForSave)
+
 
     elif cv2.waitKey(0) & 0xFF == ord('4'):
         cv2.imwrite(navn, threshpic4)
         print(navn)
-        print(pathForSave)
+
 
     elif cv2.waitKey(0) & 0xFF == ord('5'):
         cv2.imwrite(navn, threshpic5)
         print(navn)
-        print(pathForSave)
+
 
     elif cv2.waitKey(0) & 0xFF == ord('6'):
         cv2.imwrite(navn, threshpic4)
         print(navn)
-        print(pathForSave)
+
 
     elif cv2.waitKey(0) & 0xFF == ord('7'):
         cv2.imwrite(navn, threshpic5)
         print(navn)
-        print(pathForSave)
+
 
 
 
