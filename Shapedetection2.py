@@ -115,10 +115,10 @@ def warpPicture(botRight, botLeft, topRight, topLeft, img):
     print(str(counter))
     cv2.imshow('' + str(counter), output)
 
-    #cv2.imwrite('skiftnavn_' + str(counter) + '.jpg', output)
-    #print('warpedPicture' + str(counter+266))
-    return checkAfAlle(output)
-    #return str('der er blevet taget et billed')
+    cv2.imwrite('skiftnavn_' + str(counter) + '.jpg', output)
+    #print('warpedPicture' + str(counter))
+    #return checkAfAlle(output)
+    return str('der er blevet taget et billed')
 
 
 def checkAfkort(img, template):

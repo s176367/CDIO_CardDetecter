@@ -10,6 +10,8 @@ frameheight = 1080
 
 ref_point = []
 crop = False
+j = False
+
 
 cap = cv2.VideoCapture(cv2.CAP_DSHOW + 0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, framewidth)
@@ -36,7 +38,7 @@ counter = 0
 
 
 def getContours(img, imgContour, standardimg):
-    global counter, string, contours
+    global counter, string, contours, j
 
     # Bare for at vise contures
     contours1, hierachy1 = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
@@ -44,11 +46,11 @@ def getContours(img, imgContour, standardimg):
 
     if cv2.waitKey(1) & 0xFF == ord('c'):
         i = 0
-        j = False
-
         if j:
             roiDeck0 = standardimg[1 + 1:400 - 1, 600 + 1:920 - 1]
-            decks = [roiDeck0]
+            roiDeck1 = standardimg[1 + 1:400 - 1, 600 + 1:920 - 1]
+
+            decks = [roiDeck0, roiDeck1]
 
         else:
             roiDeck0 = standardimg[1 + 1:400 - 1, 600 + 1:920 - 1]
@@ -63,16 +65,18 @@ def getContours(img, imgContour, standardimg):
             decks = [roiDeck0, roiDeck1, roiDeck2, roiDeck3, roiDeck4, roiDeck5, roiDeck6, roiDeck7, roiDiscard]
 
         for x in decks:
-            if i == 8 and j == False:
+            if i > 7 and j == False:
                 print(deckpile)
                 whileReact(deckpile)
                 deckpile.clear()
                 j = True
 
-            elif j and len(deckpile) < 1:
-                print(deckpile)
+            elif j and len(deckpile) == 1:
+                print(deckpile[0])
                 whileReact(deckpile)
                 deckpile.clear()
+                print(deckpile)
+                break
 
             imgBlur = cv2.GaussianBlur(decks[i], (7, 7), 3)
             imgGray = cv2.cvtColor(imgBlur, cv2.COLOR_BGR2GRAY)
@@ -137,14 +141,14 @@ def warpPicture(botRight, botLeft, topRight, topLeft, img):
 def checkAfkort(img, template):
     img1 = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
     template1 = cv2.cvtColor(template, cv2.COLOR_RGB2GRAY)
-    # cv2.imshow('tresh1', img1)
+    #cv2.imshow('tresh1'+ str(counter), img1)
     # cv2.imshow('tresh2', template1)
 
-    ret, thresh1 = cv2.threshold(img1, 170, 230, cv2.THRESH_BINARY)
-    ret, thresh11 = cv2.threshold(template1, 150, 230, cv2.THRESH_BINARY)
+    ret, thresh1 = cv2.threshold(img1, 170, 250, cv2.THRESH_BINARY)
+    ret, thresh11 = cv2.threshold(template1, 170, 250, cv2.THRESH_BINARY)
     bitwise = cv2.bitwise_xor(thresh1, thresh11)
     #cv2.imshow('img'+ str(counter), thresh1)
-    #cv2.imshow('template'+ str(counter), thresh11)
+    cv2.imshow('template'+ str(counter), thresh11)
     # cv2.imshow('bitwise',bitwise)
     # cv2.waitKey(0)
     # cv2.destroyAllWindows()
