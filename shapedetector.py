@@ -43,20 +43,24 @@ def getContours(img, imgContour, standardimg):
     cv2.drawContours(imgContour, contours1, -1, (255, 0, 255), 1)
 
     if cv2.waitKey(1) & 0xFF == ord('c'):
-        roiDeck0 = standardimg[1 + 1:400 - 1, 600 + 1:920 - 1]
-        roiDeck1 = standardimg[500 + 1:1070 - 1, 1 + 1:240 - 1]
-        roiDeck2 = standardimg[500 + 1:1070 - 1, 280 + 1:520 - 1]
-        roiDeck3 = standardimg[500 + 1:1070 - 1, 560 + 1:800 - 1]
-        roiDeck4 = standardimg[500 + 1:1070 - 1, 840 + 1:1080 - 1]
-        roiDeck5 = standardimg[500 + 1:1070 - 1, 1120 + 1:1360 - 1]
-        roiDeck6 = standardimg[500 + 1:1070 - 1, 1400 + 1:1640 - 1]
-        roiDeck7 = standardimg[500 + 1:1070 - 1, 1680 + 1:1918 - 1]
-        roiDiscard = standardimg[1 + 1:400 - 1, 280 + 1:520 - 1]
-        decks = [roiDeck0, roiDeck1, roiDeck2, roiDeck3, roiDeck4, roiDeck5, roiDeck6, roiDeck7, roiDiscard]
-
         i = 0
-
         j = False
+
+        if j:
+            roiDeck0 = standardimg[1 + 1:400 - 1, 600 + 1:920 - 1]
+            decks = [roiDeck0]
+
+        else:
+            roiDeck0 = standardimg[1 + 1:400 - 1, 600 + 1:920 - 1]
+            roiDeck1 = standardimg[500 + 1:1070 - 1, 1 + 1:240 - 1]
+            roiDeck2 = standardimg[500 + 1:1070 - 1, 280 + 1:520 - 1]
+            roiDeck3 = standardimg[500 + 1:1070 - 1, 560 + 1:800 - 1]
+            roiDeck4 = standardimg[500 + 1:1070 - 1, 840 + 1:1080 - 1]
+            roiDeck5 = standardimg[500 + 1:1070 - 1, 1120 + 1:1360 - 1]
+            roiDeck6 = standardimg[500 + 1:1070 - 1, 1400 + 1:1640 - 1]
+            roiDeck7 = standardimg[500 + 1:1070 - 1, 1680 + 1:1918 - 1]
+            roiDiscard = standardimg[1 + 1:400 - 1, 280 + 1:520 - 1]
+            decks = [roiDeck0, roiDeck1, roiDeck2, roiDeck3, roiDeck4, roiDeck5, roiDeck6, roiDeck7, roiDiscard]
 
         for x in decks:
             if i == 8 and j == False:
@@ -65,13 +69,12 @@ def getContours(img, imgContour, standardimg):
                 deckpile.clear()
                 j = True
 
-            elif j and len(deckpile) <1:
+            elif j and len(deckpile) < 1:
+                print(deckpile)
                 whileReact(deckpile)
-
-
+                deckpile.clear()
 
             imgBlur = cv2.GaussianBlur(decks[i], (7, 7), 3)
-
             imgGray = cv2.cvtColor(imgBlur, cv2.COLOR_BGR2GRAY)
             threshold1 = 39
             threshold2 = 175
