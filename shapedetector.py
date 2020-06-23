@@ -46,10 +46,10 @@ def getContours(img, imgContour, standardimg):
 
     if cv2.waitKey(1) & 0xFF == ord('c'):
         i = 0
+        #Check if its past first round. If it is, it will only detect in scanning field
         if j:
             roiDeck0 = standardimg[1 + 1:400 - 1, 600 + 1:920 - 1]
             roiDeck1 = standardimg[1 + 1:400 - 1, 600 + 1:920 - 1]
-
             decks = [roiDeck0, roiDeck1]
 
         else:
@@ -63,13 +63,14 @@ def getContours(img, imgContour, standardimg):
             roiDeck7 = standardimg[500 + 1:1070 - 1, 1680 + 1:1918 - 1]
             roiDiscard = standardimg[1 + 1:400 - 1, 280 + 1:520 - 1]
             decks = [roiDeck0, roiDeck1, roiDeck2, roiDeck3, roiDeck4, roiDeck5, roiDeck6, roiDeck7, roiDiscard]
-
+        #Checks every deck for ROI (region of interest) aka the decks.
         for x in decks:
             if i > 7 and j == False:
                 print(deckpile)
                 whileReact(deckpile)
                 deckpile.clear()
                 j = True
+        #if its past the first round, the deckpile will only have the scanning field.
 
             elif j and len(deckpile) == 1:
                 print(deckpile[0])
@@ -87,20 +88,19 @@ def getContours(img, imgContour, standardimg):
             kernel = np.ones((5, 5))
             imgDil = cv2.dilate(imgCanny, kernel, iterations=1)
             contours, hierachy = cv2.findContours(imgDil, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-            # cv2.drawContours(roiDeck1, contours, -1, (255, 0, 255), 1)
+
             for contour in contours:
                 area = cv2.contourArea(contour)
-                # areaMin = cv2.getTrackbarPos("area", "parameters")
                 areaMin = 40000
 
                 if area > areaMin:
                     peri = cv2.arcLength(contour, True)
                     approx = cv2.approxPolyDP(contour, 0.02 * peri, True)
                     box = np.int0(approx)
+
+
                     if len(approx) == 4:
-
                         counter = counter + 1
-
                         if box[1][0][1] > box[3][0][1]:
                             pathname = warpPicture(box[2], box[1], box[3], box[0], decks[i])
                             print(pathname)
@@ -129,29 +129,15 @@ def warpPicture(botRight, botLeft, topRight, topLeft, img):
     pts2 = np.float32([[0, 0], [width, 0], [0, height], [width, height]])
     matrix = cv2.getPerspectiveTransform(pts1, pts2)
     output = cv2.warpPerspective(img, matrix, (width, height))
-    # checkAfAlle(output)
-    #print(str(counter))
-    #cv2.imshow('' + str(counter), output)
-
-    # cv2.imwrite('templateCards/1_234.jpg', output)
-    # print('warpedPicture' + str(counter+266))
     return checkAll(output)
 
 
 def checkCard(img, template):
     img1 = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
     template1 = cv2.cvtColor(template, cv2.COLOR_RGB2GRAY)
-    #cv2.imshow('tresh1'+ str(counter), img1)
-    # cv2.imshow('tresh2', template1)
-
     ret, thresh1 = cv2.threshold(img1, 170, 250, cv2.THRESH_BINARY)
     ret, thresh11 = cv2.threshold(template1, 170, 250, cv2.THRESH_BINARY)
     bitwise = cv2.bitwise_xor(thresh1, thresh11)
-    #cv2.imshow('img'+ str(counter), thresh1)
-    #cv2.imshow('template'+ str(counter), thresh11)
-    # cv2.imshow('bitwise',bitwise)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
     return (cv2.countNonZero(bitwise))
 
 
@@ -203,7 +189,7 @@ while True:
 
     getContours(imgDil, imgContour, img)
 
-    # imgstack = stackImages(0.8, ([img, imgGray, imgCanny], [imgDil, imgContour, imgWarp]))
+
     cv2.imshow("result", imgContour)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break

@@ -2,15 +2,13 @@ from PythonSocket import *
 
 global seenCards
 
-
+#This method takes the name of the matching template and adds the corrosponding card to the cardpile.
 def dataForwarding(pathName):
 
 
     if pathName == '1':
         card = Card(0, 2)
         deckpile.append(card)
-        #print('Ace of hearts')
-        #print(deckpile[0])
         return
 
     elif pathName == '2':

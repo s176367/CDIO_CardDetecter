@@ -37,7 +37,6 @@ counter = 0
 
 def getContours(img, imgContour, standardimg):
     global counter, string, contours
-
     # Bare for at vise contures
     contours1, hierachy1 = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
     cv2.drawContours(imgContour, contours1, -1, (255, 0, 255), 1)

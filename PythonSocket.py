@@ -28,11 +28,7 @@ class CardPileEncoder(JSONEncoder):
     return o.__dict__
 
 deckpile = []
-# for i in range(4):
-#   for y in range(13):
-#     card = Card(y,i)
-#     deckpile.append(card)
-# random.shuffle(deckpile)
+
 
 def whileReact(deckpile):
 
