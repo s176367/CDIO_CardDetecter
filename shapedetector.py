@@ -40,7 +40,7 @@ counter = 0
 def getContours(img, imgContour, standardimg):
     global counter, string, contours, j
 
-    # Bare for at vise contures
+    # Shows Contours in the live video feed
     contours1, hierachy1 = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
     cv2.drawContours(imgContour, contours1, -1, (255, 0, 255), 1)
 
@@ -114,7 +114,7 @@ def getContours(img, imgContour, standardimg):
                     else:
                         x, y, w, h = cv2.boundingRect(approx)
                         cv2.putText(imgContour,
-                                    "Antal Corners " + str(len(approx)),
+                                    "Amount of Corners " + str(len(approx)),
                                     (x + w + 20, y + 85),
                                     cv2.FONT_HERSHEY_COMPLEX, 0.7,
                                     (0, 255, 0), 2)
@@ -135,10 +135,10 @@ def warpPicture(botRight, botLeft, topRight, topLeft, img):
 
     # cv2.imwrite('templateCards/1_234.jpg', output)
     # print('warpedPicture' + str(counter+266))
-    return checkAfAlle(output)
+    return checkAll(output)
 
 
-def checkAfkort(img, template):
+def checkCard(img, template):
     img1 = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
     template1 = cv2.cvtColor(template, cv2.COLOR_RGB2GRAY)
     #cv2.imshow('tresh1'+ str(counter), img1)
@@ -148,14 +148,14 @@ def checkAfkort(img, template):
     ret, thresh11 = cv2.threshold(template1, 170, 250, cv2.THRESH_BINARY)
     bitwise = cv2.bitwise_xor(thresh1, thresh11)
     #cv2.imshow('img'+ str(counter), thresh1)
-    cv2.imshow('template'+ str(counter), thresh11)
+    #cv2.imshow('template'+ str(counter), thresh11)
     # cv2.imshow('bitwise',bitwise)
     # cv2.waitKey(0)
     # cv2.destroyAllWindows()
     return (cv2.countNonZero(bitwise))
 
 
-def checkAfAlle(img):
+def checkAll(img):
     path = "templateCards/"
     bestmatch = 10000000000
     pathforCard = ''
@@ -166,7 +166,7 @@ def checkAfAlle(img):
         input_path = os.path.join(path, image_path)
         template = cv2.imread(input_path)
 
-        nuværendematch = checkAfkort(img, template)
+        nuværendematch = checkCard(img, template)
         # Køre checkAfSpecifiktKort
         if nuværendematch < bestmatch:
             pathforCard = input_path.replace('templateCards/', '')

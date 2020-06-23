@@ -2,9 +2,9 @@ import cv2
 
 
 
-img = cv2.imread('templateCards/18_1.jpg', cv2.IMREAD_GRAYSCALE)
-template = cv2.imread('templateCards/41_1.jpg', cv2.IMREAD_GRAYSCALE)
-template1 = cv2.imread('templateCards/42.jpg', cv2.IMREAD_GRAYSCALE)
+img = cv2.imread('templateCards/15_17261.jpg', cv2.IMREAD_GRAYSCALE)
+template = cv2.imread('templateCards/15_18772.jpg', cv2.IMREAD_GRAYSCALE)
+template1 = cv2.imread('templateCards/15_17261.jpg', cv2.IMREAD_GRAYSCALE)
 
 ret, thresh1 = cv2.threshold(img, 170, 250, cv2.THRESH_BINARY)
 ret, thresh2 = cv2.threshold(template, 170, 250, cv2.THRESH_BINARY)

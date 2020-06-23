@@ -111,7 +111,7 @@ def warpPicture(botRight, botLeft, topRight, topLeft, img):
     pts2 = np.float32([[0, 0], [width, 0], [0, height], [width, height]])
     matrix = cv2.getPerspectiveTransform(pts1, pts2)
     output = cv2.warpPerspective(img, matrix, (width, height))
-    # checkAfAlle(output)
+    #checkAfAlle(output)
     print(str(counter))
     cv2.imshow('' + str(counter), output)
 
