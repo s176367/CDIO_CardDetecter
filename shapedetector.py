@@ -90,17 +90,20 @@ def getContours(img, imgContour, standardimg):
             contours, hierachy = cv2.findContours(imgDil, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
             for contour in contours:
+                #OpenCV method to get area of contour
                 area = cv2.contourArea(contour)
                 areaMin = 40000
-
+                #sets minimum area of contour, so only cards will be detected
                 if area > areaMin:
                     peri = cv2.arcLength(contour, True)
+                    #approximation of a shape of the contours
                     approx = cv2.approxPolyDP(contour, 0.02 * peri, True)
                     box = np.int0(approx)
 
-
+                    #if the approx has more than 4 corners the method will not warp on the card, as a card does not have more than 4 corners
                     if len(approx) == 4:
                         counter = counter + 1
+                        #2 if statements as the card can be flipped, if the left bottom corner has the lowest y-value in a picture
                         if box[1][0][1] > box[3][0][1]:
                             pathname = warpPicture(box[2], box[1], box[3], box[0], decks[i])
                             print(pathname)
@@ -125,9 +128,12 @@ def getContours(img, imgContour, standardimg):
 
 def warpPicture(botRight, botLeft, topRight, topLeft, img):
     width, height, = 400, 400
+    #creates points with the coordinates of the cards corners.
     pts1 = np.float32([botRight, botLeft, topRight, topLeft])
     pts2 = np.float32([[0, 0], [width, 0], [0, height], [width, height]])
+    #This method uses the 2 points to get the perspective of the card, and define the size of the warped card from pts2
     matrix = cv2.getPerspectiveTransform(pts1, pts2)
+    #warps perspective of the card so only the card is shown
     output = cv2.warpPerspective(img, matrix, (width, height))
     return checkAll(output)
 
@@ -178,11 +184,13 @@ while True:
     cv2.rectangle(imgContour, (600, 1), (900, 400), (0, 0, 255), 2)
     cv2.rectangle(imgContour, (520, 1), (280, 400), (255, 0, 0), 2)
 
+    #Different OpenCV methods to give the correct picture for other methods and for easier contour finding
     imgBlur = cv2.GaussianBlur(img, (7, 7), 3)
     imgGray = cv2.cvtColor(imgBlur, cv2.COLOR_BGR2GRAY)
     threshold1 = cv2.getTrackbarPos("Threshold1", "parameters")
     threshold2 = cv2.getTrackbarPos("Threshold2", "parameters")
 
+    #Edge detection
     imgCanny = cv2.Canny(imgGray, threshold1, threshold2)
     kernel = np.ones((5, 5))
     imgDil = cv2.dilate(imgCanny, kernel, iterations=1)
